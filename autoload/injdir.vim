@@ -1,7 +1,7 @@
 let s:save_cpo= &cpo
 set cpo&vim
 
-let s:V= vital#of('vital')
+let s:V= vital#of('injdir')
 let s:L= s:V.import('Data.List')
 unlet s:V
 
