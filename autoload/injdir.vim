@@ -24,7 +24,21 @@ set cpo&vim
 
 let s:V= vital#of('injdir')
 let s:L= s:V.import('Data.List')
+let s:S= s:V.import('Data.String')
+
+let s:vital_modules= {
+\   'Data.List': s:L,
+\   'Data.String': s:S,
+\}
 unlet s:V
+
+function! injdir#vital(module)
+    if has_key(s:vital_modules, a:module)
+        return s:vital_modules[a:module]
+    else
+        throw printf("injdir: module not found `%s'", a:module)
+    endif
+endfunction
 
 let s:choose_template= {}
 
@@ -46,7 +60,9 @@ function! s:choose_template.apply(functors, context)
     \})
 endfunction
 
-let s:inject= {}
+let s:inject= {
+\   'expr_parser': injdir#expr_parser#new(),
+\}
 
 function! s:inject.apply(functors, context) abort
     let template_dir= a:context.config.template_dir
@@ -81,7 +97,9 @@ function! s:inject.apply(functors, context) abort
     for file in structure.files
         echomsg printf("copy file: `%s'", file)
         if !filereadable(file)
-            call writefile(readfile(template_dir . '/' . relpath . '/' . file), file)
+            let lines= readfile(template_dir . '/' . relpath . '/' . file)
+
+            call writefile(self.expr_parser.parse(lines), file)
         endif
     endfor
 
