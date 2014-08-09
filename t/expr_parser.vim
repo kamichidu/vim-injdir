@@ -1,6 +1,8 @@
 set runtimepath+=./.vim-test/*
 filetype plugin indent on
 
+runtime plugin/*.vim
+
 describe 'injdir#expr_parser'
     it 'can replace embedded vim expression to plain text'
         let parser= injdir#expr_parser#new()

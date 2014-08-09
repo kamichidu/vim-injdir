@@ -34,6 +34,7 @@ let g:loaded_injdir= 1
 let g:injdir_config= get(g:, 'injdir_config', {})
 let g:injdir_config.template_dir= get(g:injdir_config, 'template_dir', expand('~/.injdir/template/'))
 let g:injdir_config.scripts_dir= get(g:injdir_config, 'scripts_dir', expand('~/.injdir/scripts/'))
+let g:injdir_config.log_level= get(g:injdir_config, 'log_level', 'info')
 
 command! InjdirSetup call injdir#setup()
 

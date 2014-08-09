@@ -22,6 +22,9 @@
 let s:save_cpo= &cpo
 set cpo&vim
 
+let s:injector=      injdir#injector#new()
+let s:script_runner= injdir#script_runner#new()
+
 let s:expand= {
 \   'is_quit': 1,
 \   'is_selectable': 1,
@@ -31,9 +34,15 @@ function! s:expand.func(candidate)
     let candidates= (type(a:candidate) == type([])) ? deepcopy(a:candidate) : [deepcopy(a:candidate)]
 
     for candidate in candidates
-        let delegate= candidate.action__delegate
+        let template_dir= candidate.action__template_dir
+        let scripts_dir=  candidate.action__scripts_dir
+        let relpath=      candidate.action__relpath
+        let before_scripts_dir= scripts_dir . '/' . relpath . '/before/'
+        let after_scripts_dir=  scripts_dir . '/' . relpath . '/after/'
 
-        call delegate.apply(candidate)
+        call s:script_runner.run(before_scripts_dir, getcwd())
+        call s:injector.inject(template_dir . '/' . relpath, getcwd())
+        call s:script_runner.run(after_scripts_dir, getcwd())
     endfor
 endfunction
 

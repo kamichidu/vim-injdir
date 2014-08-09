@@ -28,8 +28,8 @@ let s:template= {
 \}
 
 function! s:template.gather_candidates(args, context)
-    let injdir_context= a:context.source__injdir_context
-    let template_dir= injdir_context.config.template_dir
+    let template_dir= g:injdir_config.template_dir
+    let scripts_dir=  g:injdir_config.scripts_dir
 
     if !isdirectory(template_dir)
         return []
@@ -43,8 +43,9 @@ function! s:template.gather_candidates(args, context)
     \   {
     \       'word': fnamemodify(v:val, ':t'),
     \       'kind': 'injdir/template',
-    \       'action__delegate': a:context.source__delegate,
-    \       'action__relpath':  fnamemodify(v:val, ':t'),
+    \       'action__template_dir': template_dir,
+    \       'action__scripts_dir':  scripts_dir,
+    \       'action__relpath':      fnamemodify(v:val, ':t'),
     \   }
     \")
 endfunction

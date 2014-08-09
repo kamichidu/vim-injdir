@@ -22,39 +22,47 @@
 let s:save_cpo= &cpo
 set cpo&vim
 
-let s:V= vital#of('injdir')
-let s:S= s:V.import('Data.String')
-unlet s:V
-
-let s:parser= {
+let s:runner= {
 \   'attrs': {
-\       'logger': injdir#logger#new('expr_parser'),
+\       'logger': injdir#logger#new('script_runner'),
 \   },
 \}
 
-function! s:parser.parse(lines)
-    let lines= (type(a:lines) == type([])) ? a:lines : [a:lines]
-    let result= []
+function! s:runner.run(scripts_dir, working_dir) abort
+    let scripts= self.get_scripts(a:scripts_dir)
 
-    for line in lines
-        let exprs= s:S.scan(line, '`=.\{-}`')
+    let save_cwd= getcwd()
+    try
+        execute 'lcd' a:working_dir
+        call self.attrs.logger.info("Change working directory to `%s'", a:working_dir)
 
-        " expr is `=xxxx`
-        for expr in exprs
-            call self.attrs.logger.trace("found expression `%s'", expr)
-            let res= eval(matchstr(expr, '`=\zs.\{-}\ze`'))
-            call self.attrs.logger.trace("expression evaluated `%s'", res)
-            let line= s:S.replace_first(line, expr, res)
+        " run scriptS
+        call self.attrs.logger.info('Running scripts...')
+        for script in scripts
+            call self.attrs.logger.info("Run script: `%s'", script)
+
+            let pipe= vimproc#popen2(script)
+
+            while !pipe.stdout.eof
+                call self.attrs.logger.info(pipe.stdout.read())
+            endwhile
+
+            call pipe.waitpid()
         endfor
-
-        let result+= [line]
-    endfor
-
-    return result
+    finally
+        execute 'lcd' save_cwd
+    endtry
 endfunction
 
-function! injdir#expr_parser#new()
-    return deepcopy(s:parser)
+function! s:runner.get_scripts(scripts_dir)
+    let scripts= split(globpath(a:scripts_dir, '*'), '\%(\r\n\|\r\|\n\)')
+    let scripts= filter(copy(scripts), 'filereadable(v:val)')
+
+    return scripts
+endfunction
+
+function! injdir#script_runner#new()
+    return deepcopy(s:runner)
 endfunction
 
 let &cpo= s:save_cpo
