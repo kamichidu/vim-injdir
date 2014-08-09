@@ -1,0 +1,5 @@
+.bundle/
+.vim-flavor/
+.vim-test/
+Gemfile.lock
+VimFlavor.lock
