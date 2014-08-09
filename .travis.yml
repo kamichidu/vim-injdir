@@ -1,5 +1,4 @@
 language: ruby
 rvm:
     - 2.0.0
-before_script: chmod u+w ~
 script: rake ci
