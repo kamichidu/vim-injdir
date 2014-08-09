@@ -59,8 +59,9 @@ describe 'injdir#injector'
         Expect has_key(structure, 'files') to_be_true
 
         let structure.directories= map(structure.directories, 'injector.to_relpath(base_dir, v:val)')
+        let structure.files=       map(structure.files, 'injector.to_relpath(base_dir, v:val)')
 
-        Expect structure ==# {'directories': ['piyo/', 'piyo/puyo/'], 'files': []}
+        Expect structure ==# {'directories': ['piyo/', 'piyo/puyo/'], 'files': ['piyo/puyo/.gitkeep']}
     end
 
     it 'can inject directory structure'
