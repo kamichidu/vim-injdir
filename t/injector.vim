@@ -11,7 +11,7 @@ describe 'injdir#injector'
             throw 'directory already exists, abort test'
         endif
 
-        call mkdir(g:to_dir, 'p')
+        call system('mkdir -p ' . g:to_dir)
         " can't make absolute path when g:to_dir is not exists.
         let g:to_dir= fnamemodify(g:to_dir, ':p')
     end
