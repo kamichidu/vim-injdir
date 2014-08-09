@@ -33,6 +33,36 @@ describe 'injdir#injector'
         Expect relpath ==# 'A'
     end
 
+    it 'can get file structure'
+        let injector= injdir#injector#new()
+
+        let base_dir= fnamemodify('./t/fixtures/template//hoge/', ':p')
+
+        let structure= injector.get_structure(base_dir)
+
+        Expect has_key(structure, 'directories') to_be_true
+        Expect has_key(structure, 'files') to_be_true
+
+        let structure.files= map(structure.files, 'injector.to_relpath(base_dir, v:val)')
+
+        Expect structure ==# {'directories': [], 'files': ['.C', 'A', 'B']}
+    end
+
+    it 'can get directory structure'
+        let injector= injdir#injector#new()
+
+        let base_dir= fnamemodify('./t/fixtures/template//fuga/', ':p')
+
+        let structure= injector.get_structure(base_dir)
+
+        Expect has_key(structure, 'directories') to_be_true
+        Expect has_key(structure, 'files') to_be_true
+
+        let structure.directories= map(structure.directories, 'injector.to_relpath(base_dir, v:val)')
+
+        Expect structure ==# {'directories': ['piyo/', 'piyo/puyo/'], 'files': []}
+    end
+
     it 'can inject directory structure'
         let injector= injdir#injector#new()
 
@@ -40,10 +70,9 @@ describe 'injdir#injector'
 
         call injector.inject(from_dir, g:to_dir)
 
-        let expected= map(split(globpath(from_dir, '**'), '\%(\r\n\|\r\|\n\)'), 'injector.to_relpath(from_dir, v:val)')
-        let actual=   map(split(globpath(g:to_dir, '**'), '\%(\r\n\|\r\|\n\)'), 'injector.to_relpath(g:to_dir, v:val)')
+        let actual= map(split(globpath(g:to_dir, '**'), '\%(\r\n\|\r\|\n\)'), 'injector.to_relpath(g:to_dir, v:val)')
 
-        Expect actual ==# expected
+        Expect actual ==# ['piyo', 'piyo/puyo']
     end
 
     it 'can inject file structure'
@@ -53,9 +82,12 @@ describe 'injdir#injector'
 
         call injector.inject(from_dir, g:to_dir)
 
-        let expected= map(split(globpath(from_dir, '**'), '\%(\r\n\|\r\|\n\)'), 'injector.to_relpath(from_dir, v:val)')
-        let actual=   map(split(globpath(g:to_dir, '**'), '\%(\r\n\|\r\|\n\)'), 'injector.to_relpath(g:to_dir, v:val)')
+        let actual= map(split(globpath(g:to_dir, '**'), '\%(\r\n\|\r\|\n\)'), 'injector.to_relpath(g:to_dir, v:val)')
+        let actual+= map(split(globpath(g:to_dir, '**/.*'), '\%(\r\n\|\r\|\n\)'), 'injector.to_relpath(g:to_dir, v:val)')
 
-        Expect actual ==# expected
+        call filter(actual, '!isdirectory(v:val)')
+        call sort(actual)
+
+        Expect actual ==# ['.C', 'A', 'B']
     end
 end

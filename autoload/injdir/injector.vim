@@ -92,7 +92,14 @@ function! s:injector.to_relpath(base_dir, filepath)
 endfunction
 
 function! s:injector.get_structure(dirpath)
-    let files= split(globpath(a:dirpath, '/**'), '\%(\r\n\|\r\|\n\)')
+    " list non-hidden files
+    let files= split(globpath(a:dirpath, '**'), '\%(\r\n\|\r\|\n\)')
+    " list hidden files
+    let files+= split(globpath(a:dirpath, '**/.*'), '\%(\r\n\|\r\|\n\)')
+
+    call filter(files, 'v:val !~# ''\%(\\\|/\)\.\{1,2}$''')
+    call sort(files)
+
     let directories= filter(copy(files), 'isdirectory(v:val)')
     let files= filter(copy(files), 'filereadable(v:val)')
 
