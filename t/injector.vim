@@ -5,7 +5,7 @@ runtime plugin/*.vim
 
 describe 'injdir#injector'
     before
-        let g:to_dir= './.vim-injdir-working/'
+        let g:to_dir= $TEMP . '/.vim-injdir-working/'
 
         if isdirectory(g:to_dir)
             throw 'directory already exists, abort test'
