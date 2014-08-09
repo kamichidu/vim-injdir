@@ -22,7 +22,9 @@
 let s:save_cpo= &cpo
 set cpo&vim
 
-let s:S= injdir#vital('Data.String')
+let s:V= vital#of('injdir')
+let s:S= s:V.import('Data.String')
+unlet s:V
 
 let s:parser= {}
 

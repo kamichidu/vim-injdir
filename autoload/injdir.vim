@@ -25,20 +25,7 @@ set cpo&vim
 let s:V= vital#of('injdir')
 let s:L= s:V.import('Data.List')
 let s:S= s:V.import('Data.String')
-
-let s:vital_modules= {
-\   'Data.List': s:L,
-\   'Data.String': s:S,
-\}
 unlet s:V
-
-function! injdir#vital(module)
-    if has_key(s:vital_modules, a:module)
-        return s:vital_modules[a:module]
-    else
-        throw printf("injdir: module not found `%s'", a:module)
-    endif
-endfunction
 
 let s:choose_template= {}
 
