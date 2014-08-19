@@ -65,6 +65,10 @@ describe 'injdir#injector'
     end
 
     it 'can inject directory structure'
+        if $UNDER_TRAVIS
+            SKIP 'mkdir() is a vim built-in function does not work on travis platform.'
+        endif
+
         let injector= injdir#injector#new()
 
         let from_dir= fnamemodify('./t/fixtures/template/fuga/', ':p')

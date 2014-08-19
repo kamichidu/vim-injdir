@@ -1,4 +1,4 @@
 language: ruby
 rvm:
     - 2.0.0
-script: rake ci
+script: UNDER_TRAVIS=1 rake ci
